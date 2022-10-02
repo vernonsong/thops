@@ -1,2 +1,2 @@
 # thops
-Thops is a repository that records my leetcode
+Thops is an OCR tool box based on openmmlab 2.0

@@ -1,0 +1,12 @@
+torch>=1.13.0.dev20220926
+torchvision>=0.14.0.dev20220926
+opencv-python>=4.6.0.66
+mmcv>=2.0.0rc1
+numpy>=1.23.3
+mmengine>=0.1.0
+mmocr>=1.0.0rc0
+mmcls>=1.0.0rc0
+matplotlib>=3.5.3
+setuptools>=63.4.1
+PyMuPDF>=1.20.2
+
