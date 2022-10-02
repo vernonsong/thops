@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
 # @Time : 2022/8/4 09:48
 # @Author : songweinan
 # @Software: PyCharm
 # 自能成羽翼，何必仰云梯。
 # ======================================================================================================================
-img_norm_cfg = dict(
-    mean=[0], std=[255])
+img_norm_cfg = dict(mean=[0], std=[255])
 test_pipeline = [
     dict(
         type='MultiScaleFlipAug',

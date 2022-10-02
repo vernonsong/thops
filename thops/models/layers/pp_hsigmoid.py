@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # @Time : 2022/8/16 15:44
 # @Author : songweinan
 # @Software: PyCharm
@@ -6,12 +5,14 @@
 # ======================================================================================================================
 import torch
 import torch.nn as nn
+
 from thops.registry import MODELS
 
 
 @MODELS.register_module()
 class PaddleHSigmoid(nn.Module):
-    """与mmcv的HSigmoid差别为需要增加一个1.2这个缩放因子"""
+    """与mmcv的HSigmoid差别为需要增加一个1.2这个缩放因子."""
+
     def __init__(self,
                  bias: float = 3.0,
                  divisor: float = 6.0,

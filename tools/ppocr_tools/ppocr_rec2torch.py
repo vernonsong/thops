@@ -4,14 +4,15 @@
 # 自能成羽翼，何必仰云梯。
 # ======================================================================================================================
 import mmcv
-from mmengine import Config
 import numpy as np
 import paddle.fluid as fluid
 import torch
+from mmengine import Config
 from mmengine.dataset.base_dataset import Compose
 from mmengine.registry import MODELS
-from thops.utils import register_all_modules
 from paddle import inference
+
+from thops.utils import register_all_modules
 
 
 def map_state(torch_state: dict, ppocr_state: dict) -> dict:
@@ -458,11 +459,15 @@ def main():
     inputs['data_samples'] = [inputs['data_samples']]
     model.eval()
     with torch.no_grad():
-        y = model.decoder(model.encoder(model.backbone(model.data_preprocessor(inputs, True)['inputs'])))
         torch_outputs = torch.softmax(
-            model.decoder(model.encoder(model.backbone(model.data_preprocessor(inputs, True)['inputs']))), -1)
-    model_file_path = '../../pretrained/ch_PP-OCRv3_rec_infer/inference.pdmodel'
-    params_file_path = '../../pretrained/ch_PP-OCRv3_rec_infer/inference.pdiparams'
+            model.decoder(
+                model.encoder(
+                    model.backbone(
+                        model.data_preprocessor(inputs, True)['inputs']))), -1)
+    model_file_path = '../../pretrained/ch_PP-OCRv3_rec_infer/' \
+                      'inference.pdmodel'
+    params_file_path = '../../pretrained/ch_PP-OCRv3_rec_infer/' \
+                       'inference.pdiparams'
     config = inference.Config(model_file_path, params_file_path)
     predictor = inference.create_predictor(config)
 
@@ -474,7 +479,8 @@ def main():
     for output_name in output_names:
         output_tensor = predictor.get_output_handle(output_name)
         output_tensors.append(output_tensor)
-    input_tensor.copy_from_cpu(model.data_preprocessor(inputs, True)['inputs'].numpy())
+    input_tensor.copy_from_cpu(
+        model.data_preprocessor(inputs, True)['inputs'].numpy())
     predictor.run()
     pp_outputs = []
     for output_tensor in output_tensors:

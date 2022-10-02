@@ -1,17 +1,18 @@
-# -*- coding: utf-8 -*-
 # @Time : 2022/8/8 08:20
 # @Author : songweinan
 # @Software: PyCharm
 # 自能成羽翼，何必仰云梯。
 # ======================================================================================================================
 import torch.nn as nn
-from mmengine.model import BaseModule
-from mmcv.cnn.bricks import ConvModule
 from mmcls.models.utils.se_layer import SELayer
+from mmcv.cnn.bricks import ConvModule
+from mmengine.model import BaseModule
+
 from thops.registry import MODELS
 
 
 class DepthwiseSeparable(BaseModule):
+
     def __init__(self,
                  in_channels,
                  mid_channels,
@@ -29,7 +30,6 @@ class DepthwiseSeparable(BaseModule):
         self.with_res_shortcut = (stride == 1 and in_channels == out_channels)
         # assert stride in [1, 2]
         self.with_se = with_se
-
 
         self.depthwise_conv = ConvModule(
             in_channels=in_channels,
@@ -74,6 +74,7 @@ class DepthwiseSeparable(BaseModule):
 
 @MODELS.register_module()
 class MobileNetEnhanceBackbone(BaseModule):
+
     def __init__(self,
                  in_channels=3,
                  scale=0.5,
@@ -94,12 +95,12 @@ class MobileNetEnhanceBackbone(BaseModule):
             bias=False)
 
         conv2_1 = DepthwiseSeparable(
-                in_channels=int(32 * scale),
-                mid_channels=32,
-                out_channels=64,
-                num_groups=32,
-                stride=1,
-                scale=scale)
+            in_channels=int(32 * scale),
+            mid_channels=32,
+            out_channels=64,
+            num_groups=32,
+            stride=1,
+            scale=scale)
 
         self.block_list.append(conv2_1)
 
@@ -185,7 +186,7 @@ class MobileNetEnhanceBackbone(BaseModule):
 
         self.block_list = nn.Sequential(*self.block_list)
         if last_pool_type == 'avg':
-            self.pool = nn.AvgPool2d(kernel_size=2,stride=2, padding=0)
+            self.pool = nn.AvgPool2d(kernel_size=2, stride=2, padding=0)
         else:
             self.pool = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
         self.out_channels = int(1024 * scale)
@@ -195,6 +196,3 @@ class MobileNetEnhanceBackbone(BaseModule):
         y = self.block_list(y)
         y = self.pool(y)
         return y
-
-
-

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # @Time : 2022/8/16 16:02
 # @Author : songweinan
 # @Software: PyCharm
@@ -9,6 +8,4 @@ _base_ = [
     '../_base_/models/dbnet_little.py',
 ]
 test_pipeline_1333_736 = {{_base_.test_pipeline_1333_736}}
-data = dict(
-    test=dict(pipeline=test_pipeline_1333_736)
-)
+data = dict(test=dict(pipeline=test_pipeline_1333_736))

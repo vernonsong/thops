@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # @Time : 2022/8/14 15:04
 # @Author : songweinan
 # @Software: PyCharm
@@ -7,16 +6,15 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from mmcv.cnn.bricks import ConvModule, build_activation_layer, build_norm_layer, DropPath
-from thops.registry import MODELS
+from mmcv.cnn.bricks import (ConvModule, DropPath, build_activation_layer,
+                             build_norm_layer)
 from mmocr.models.textrecog.encoders import BaseEncoder
 
-"""
-参考https://github.com/1079863482/paddle2torch_PPOCRv3
-"""
+from thops.registry import MODELS
 
 
 class Mlp(nn.Module):
+
     def __init__(self,
                  in_features,
                  hidden_features=None,
@@ -41,12 +39,14 @@ class Mlp(nn.Module):
 
 
 class ConvMixer(nn.Module):
+
     def __init__(
             self,
             dim,
             num_heads=8,
             HW=(8, 25),
-            local_k=(3, 3), ):
+            local_k=(3, 3),
+    ):
         super().__init__()
         self.HW = HW
         self.dim = dim
@@ -54,7 +54,8 @@ class ConvMixer(nn.Module):
             dim,
             dim,
             local_k,
-            1, (local_k[0] // 2, local_k[1] // 2),
+            1,
+            (local_k[0] // 2, local_k[1] // 2),
             groups=num_heads,
         )
 
@@ -66,7 +67,9 @@ class ConvMixer(nn.Module):
         x = x.flatten(2).transpose([0, 2, 1])
         return x
 
+
 class Attention(nn.Module):
+
     def __init__(self,
                  dim,
                  num_heads=8,
@@ -99,8 +102,8 @@ class Attention(nn.Module):
             for h in range(0, H):
                 for w in range(0, W):
                     mask[h * W + w, h:h + hk, w:w + wk] = 0.
-            mask_paddle = mask[:, hk // 2:H + hk // 2, wk // 2:W + wk //
-                               2].flatten(1)
+            mask_paddle = mask[:, hk // 2:H + hk // 2,
+                               wk // 2:W + wk // 2].flatten(1)
             mask_inf = torch.full([H * W, H * W], fill_value=float('-inf'))
             mask = torch.where(mask_paddle < 1, mask_paddle, mask_inf)
             self.mask = mask[None, None, :]
@@ -112,7 +115,9 @@ class Attention(nn.Module):
             C = self.C
         else:
             _, N, C = x.shape
-        qkv = self.qkv(x).reshape((-1, N, 3, self.num_heads, C //self.num_heads)).permute((2, 0, 3, 1, 4))
+        qkv = self.qkv(x).reshape(
+            (-1, N, 3, self.num_heads, C // self.num_heads)).permute(
+                (2, 0, 3, 1, 4))
         q, k, v = qkv[0] * self.scale, qkv[1], qkv[2]
 
         attn = (q.matmul(k.permute((0, 1, 3, 2))))
@@ -128,6 +133,7 @@ class Attention(nn.Module):
 
 
 class Block(nn.Module):
+
     def __init__(self,
                  dim,
                  num_heads,
@@ -144,8 +150,7 @@ class Block(nn.Module):
                  norm_cfg=dict(type='LN'),
                  prenorm=True):
         super().__init__()
-        _, self.norm1 = build_norm_layer(
-            norm_cfg, dim)
+        _, self.norm1 = build_norm_layer(norm_cfg, dim)
         if mixer == 'Global' or mixer == 'Local':
             self.mixer = Attention(
                 dim,
@@ -161,16 +166,17 @@ class Block(nn.Module):
             self.mixer = ConvMixer(
                 dim, num_heads=num_heads, HW=HW, local_k=local_mixer)
         else:
-            raise TypeError("The mixer must be one of [Global, Local, Conv]")
-        self.drop_path = DropPath(drop_path) if drop_path > 0. else nn.Identity()
-        _, self.norm2 = build_norm_layer(
-            norm_cfg, dim)
+            raise TypeError('The mixer must be one of [Global, Local, Conv]')
+        self.drop_path = DropPath(
+            drop_path) if drop_path > 0. else nn.Identity()
+        _, self.norm2 = build_norm_layer(norm_cfg, dim)
         mlp_hidden_dim = int(dim * mlp_ratio)
         self.mlp_ratio = mlp_ratio
-        self.mlp = Mlp(in_features=dim,
-                       hidden_features=mlp_hidden_dim,
-                       act_cfg=act_cfg,
-                       drop=drop)
+        self.mlp = Mlp(
+            in_features=dim,
+            hidden_features=mlp_hidden_dim,
+            act_cfg=act_cfg,
+            drop=drop)
         self.prenorm = prenorm
 
     def forward(self, x):
@@ -185,27 +191,39 @@ class Block(nn.Module):
 
 @MODELS.register_module()
 class SVTREncoder(BaseEncoder):
-    def __init__(self,
-                 in_channels,
-                 dims=64,  # XS
-                 depth=2,
-                 hidden_dims=120,
-                 use_guide=False,
-                 num_heads=8,
-                 qkv_bias=True,
-                 mlp_ratio=2.0,
-                 drop_rate=0.1,
-                 attn_drop_rate=0.1,
-                 drop_path=0.,
-                 qk_scale=None,
-                 init_cfg=None,
-                 **kwargs):
+    """参考https://github.com/1079863482/paddle2torch_PPOCRv3."""
+
+    def __init__(
+            self,
+            in_channels,
+            dims=64,  # XS
+            depth=2,
+            hidden_dims=120,
+            use_guide=False,
+            num_heads=8,
+            qkv_bias=True,
+            mlp_ratio=2.0,
+            drop_rate=0.1,
+            attn_drop_rate=0.1,
+            drop_path=0.,
+            qk_scale=None,
+            init_cfg=None,
+            **kwargs):
         super().__init__(init_cfg=init_cfg)
         self.use_guide = use_guide
         self.conv1 = ConvModule(
-            in_channels, in_channels // 8, kernel_size=3, padding=1, norm_cfg=dict(type='BN'), act_cfg=dict(type='Swish'))
+            in_channels,
+            in_channels // 8,
+            kernel_size=3,
+            padding=1,
+            norm_cfg=dict(type='BN'),
+            act_cfg=dict(type='Swish'))
         self.conv2 = ConvModule(
-            in_channels // 8, hidden_dims, kernel_size=1, norm_cfg=dict(type='BN'), act_cfg=dict(type='Swish'))
+            in_channels // 8,
+            hidden_dims,
+            kernel_size=1,
+            norm_cfg=dict(type='BN'),
+            act_cfg=dict(type='Swish'))
 
         self.svtr_block = nn.ModuleList([
             Block(
@@ -221,18 +239,29 @@ class SVTREncoder(BaseEncoder):
                 norm_cfg=dict(type='LN'),
                 attn_drop=attn_drop_rate,
                 drop_path=drop_path,
-
                 prenorm=False) for i in range(depth)
         ])
         self.norm = nn.LayerNorm(hidden_dims, eps=1e-6)
         self.conv3 = ConvModule(
-            hidden_dims, in_channels, kernel_size=1, norm_cfg=dict(type='BN'), act_cfg=dict(type='Swish'))
-        # last conv-nxn, the input is concat of input tensor and conv3 output tensor
+            hidden_dims,
+            in_channels,
+            kernel_size=1,
+            norm_cfg=dict(type='BN'),
+            act_cfg=dict(type='Swish'))
         self.conv4 = ConvModule(
-            2 * in_channels, in_channels // 8, kernel_size=3, padding=1, norm_cfg=dict(type='BN'), act_cfg=dict(type='Swish'))
+            2 * in_channels,
+            in_channels // 8,
+            kernel_size=3,
+            padding=1,
+            norm_cfg=dict(type='BN'),
+            act_cfg=dict(type='Swish'))
 
         self.conv1x1 = ConvModule(
-            in_channels // 8, dims, kernel_size=1, norm_cfg=dict(type='BN'), act_cfg=dict(type='Swish'))
+            in_channels // 8,
+            dims,
+            kernel_size=1,
+            norm_cfg=dict(type='BN'),
+            act_cfg=dict(type='Swish'))
         self.out_channels = dims
 
     def forward(self, feat, img_metas=None):

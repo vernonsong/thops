@@ -1,20 +1,22 @@
-# -*- coding: utf-8 -*-
 # @Time : 2022/7/29 15:51
 # @Author : songweinan
 # @Software: PyCharm
 # 自能成羽翼，何必仰云梯。
 # ======================================================================================================================
 import torch.nn as nn
+from mmcls.models.backbones import MobileNetV3 as MobileNetV3_
+from mmcls.models.utils import InvertedResidual, make_divisible
+from mmcls.models.utils.se_layer import SELayer
 from mmcv.cnn import ConvModule
 from mmcv.cnn.bricks import DropPath
+
 from thops.registry import MODELS
-from mmcls.models.utils import make_divisible, InvertedResidual
-from mmcls.models.utils.se_layer import SELayer
-from mmcls.models.backbones import MobileNetV3 as MobileNetV3_
 
 
 class PaddleInvertedResidual(InvertedResidual):
-    """与mmcv的InvertedResidual区别在于无论in_channels是否等于mid_channels都会使用expand_conv"""
+    """与mmcv的InvertedResidual区别在于无论in_channels是否等于mid_channels都会使用
+    expand_conv."""
+
     def __init__(self,
                  in_channels,
                  out_channels,
@@ -75,9 +77,8 @@ class PaddleInvertedResidual(InvertedResidual):
 
 @MODELS.register_module()
 class MobileNetV3(MobileNetV3_):
-    """
-    在MobileNetV3基础上增加全局屏蔽SE模块和宽度缩放
-    """
+    """在MobileNetV3基础上增加全局屏蔽SE模块和宽度缩放."""
+
     def __init__(self,
                  widen_factor=0.5,
                  disable_se=False,
@@ -85,7 +86,8 @@ class MobileNetV3(MobileNetV3_):
                  **kwargs):
         supported_scale = [0.35, 0.5, 0.75, 1.0, 1.25]
         assert widen_factor in supported_scale, \
-            "supported scale are {} but input scale is {}".format(supported_scale, widen_factor)
+            'supported scale are {} but input scale is {}'.format(
+                supported_scale, widen_factor)
         self.widen_factor = widen_factor
         self.disable_se = disable_se
         self.paddle_style = paddle_style
@@ -118,18 +120,21 @@ class MobileNetV3(MobileNetV3_):
                 se_cfg = dict(
                     channels=mid_channels,
                     ratio=4,
-                    act_cfg=(dict(type='ReLU'),
-                             dict(
-                                 type='HSigmoid' if not self.paddle_style else 'PaddleHSigmoid',
-                                 # type='HSigmoid',
-                                 bias=3,
-                                 divisor=6,
-                                 min_value=0,
-                                 max_value=1)))
+                    act_cfg=(
+                        dict(type='ReLU'),
+                        dict(
+                            type='HSigmoid'
+                            if not self.paddle_style else 'PaddleHSigmoid',
+                            # type='HSigmoid',
+                            bias=3,
+                            divisor=6,
+                            min_value=0,
+                            max_value=1)))
             else:
                 se_cfg = None
 
-            InvertedResidual_ = PaddleInvertedResidual if self.paddle_style else InvertedResidual
+            InvertedResidual_ = PaddleInvertedResidual if self.paddle_style\
+                else InvertedResidual
             layer = InvertedResidual_(
                 in_channels=in_channels,
                 out_channels=out_channels,
