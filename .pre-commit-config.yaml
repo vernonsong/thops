@@ -17,7 +17,7 @@ repos:
       - id: trailing-whitespace
       - id: check-yaml
       - id: end-of-file-fixer
-        exclude: ^dicts/
+        exclude: ^thops/dicts/
       - id: double-quote-string-fixer
       - id: check-merge-conflict
       - id: fix-encoding-pragma
