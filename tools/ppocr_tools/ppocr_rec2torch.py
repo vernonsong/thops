@@ -2,7 +2,7 @@
 # @Author : songweinan
 # @Software: PyCharm
 # 自能成羽翼，何必仰云梯。
-# ======================================================================================================================
+# ==============================================================================
 import mmcv
 import numpy as np
 import paddle.fluid as fluid
@@ -461,9 +461,11 @@ def main():
     with torch.no_grad():
         torch_outputs = torch.softmax(
             model.decoder(
+                None,
                 model.encoder(
                     model.backbone(
                         model.data_preprocessor(inputs, True)['inputs']))), -1)
+
     model_file_path = '../../pretrained/ch_PP-OCRv3_rec_infer/' \
                       'inference.pdmodel'
     params_file_path = '../../pretrained/ch_PP-OCRv3_rec_infer/' \

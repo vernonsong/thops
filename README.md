@@ -1,2 +1,5 @@
 # thops
-Thops is an OCR tool box based on openmmlab 2.0
+
+基于openmmlab的ocr工具库
+
+## ppocr

@@ -2,11 +2,11 @@
 # @Author : songweinan
 # @Software: PyCharm
 # 自能成羽翼，何必仰云梯。
-# ======================================================================================================================
+# ==============================================================================
 dictionary = dict(
     type='Dictionary',
     dict_file='{{ fileDirname }}/../../../thops/dicts/ppocr_keys_v1.txt',
-    with_padding=True,
+    with_padding=False,
     with_unknown=True)
 model = dict(
     type='thops.SVTR',
@@ -17,10 +17,10 @@ model = dict(
     ),
     encoder=dict(type='thops.SVTREncoder', in_channels=512),
     decoder=dict(
-        type='mmocr.CRNNDecoder',
+        type='thops.CRNNDecoder',
         in_channels=64,
         rnn_flag=False,
-        postprocessor=dict(type='CTCPostProcessor'),
+        postprocessor=dict(type='thops.CTCPostProcessor'),
         dictionary=dictionary),
     data_preprocessor=dict(
         type='mmocr.TextRecogDataPreprocessor', mean=[127], std=[127])

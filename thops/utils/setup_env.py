@@ -2,9 +2,10 @@
 # @Author : songweinan
 # @Software: PyCharm
 # 自能成羽翼，何必仰云梯。
-# ======================================================================================================================
+# ==============================================================================
 import datetime
 import warnings
+
 from mmengine.registry import DefaultScope
 from mmocr.utils import register_all_modules as register_all_modules_
 
@@ -25,6 +26,7 @@ def register_all_modules(init_default_scope: bool = True) -> None:
     # import mmocr.engine  # noqa: F401,F403
     # import mmocr.evaluation  # noqa: F401,F403
     import thops.models  # noqa: F401,F403
+
     # import mmocr.structures  # noqa: F401,F403
     # import mmocr.visualization  # noqa: F401,F403
     register_all_modules_(init_default_scope=False)

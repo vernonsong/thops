@@ -2,7 +2,7 @@
 # @Author : songweinan
 # @Software: PyCharm
 # 自能成羽翼，何必仰云梯。
-# ======================================================================================================================
+# ==============================================================================
 from mmocr.models.textrecog.recognizers.encoder_decoder_recognizer import \
     EncoderDecoderRecognizer
 

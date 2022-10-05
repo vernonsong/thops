@@ -2,8 +2,7 @@
 # @Author : songweinan
 # @Software: PyCharm
 # 自能成羽翼，何必仰云梯。
-# ======================================================================================================================
-
+# ==============================================================================
 model = dict(
     type='mmocr.DBNet',
     backbone=dict(
@@ -24,7 +23,9 @@ model = dict(
         in_channels=96,
         module_loss=dict(type='DBModuleLoss'),
         postprocessor=dict(
-            type='mmocr.DBPostprocessor', text_repr_type='quad')),
+            type='mmocr.DBPostprocessor',
+            text_repr_type='quad',
+            epsilon_ratio=0.001)),
     data_preprocessor=dict(
         type='mmocr.TextDetDataPreprocessor',
         mean=[123.675, 116.28, 103.53],

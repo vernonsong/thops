@@ -2,7 +2,7 @@
 # @Author : songweinan
 # @Software: PyCharm
 # 自能成羽翼，何必仰云梯。
-# ======================================================================================================================
+# ==============================================================================
 import torch.nn as nn
 from mmcls.models.utils.se_layer import SELayer
 from mmcv.cnn.bricks import ConvModule
