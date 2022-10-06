@@ -7,6 +7,4 @@ mmengine>=0.1.0
 mmocr>=1.0.0rc0
 mmcls>=1.0.0rc0
 matplotlib>=3.5.3
-setuptools>=63.4.1
 PyMuPDF>=1.20.2
-
