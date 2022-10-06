@@ -432,9 +432,9 @@ def map_state(torch_state: dict, ppocr_state: dict) -> dict:
 
 def main():
     register_all_modules(init_default_scope=False)
-    torch_model_path = '../../pretrained/ppocr_v3_svtr.pth'
-    ppocr_model_path = '../../pretrained/ch_PP-OCRv3_rec_train/best_accuracy'
-    cfg = Config.fromfile('../../configs/_base_/models/svtr_little.py')
+    torch_model_path = 'pretrained/ppocr_v3_svtr.pth'
+    ppocr_model_path = 'pretrained/ch_PP-OCRv3_rec_train/best_accuracy'
+    cfg = Config.fromfile('configs/_base_/models/svtr_little.py')
     model = MODELS.build(cfg.model)
 
     ppocr_state = fluid.io.load_program_state(ppocr_model_path)
@@ -443,9 +443,9 @@ def main():
     torch.save(state_torch, torch_model_path)
 
     model.load_state_dict(state_torch)
-    img = mmcv.imread('../../demo/3.jpg')
+    img = mmcv.imread('demo/3.jpg')
     cfg = Config.fromfile(
-        '../../configs/_base_/datasets/rec_pipeline.py').test_pipeline
+        'configs/_base_/datasets/rec_pipeline.py').test_pipeline
     cfg.pop(0)
     test_pipeline = Compose(cfg)
     inputs = test_pipeline({
@@ -466,10 +466,8 @@ def main():
                     model.backbone(
                         model.data_preprocessor(inputs, True)['inputs']))), -1)
 
-    model_file_path = '../../pretrained/ch_PP-OCRv3_rec_infer/' \
-                      'inference.pdmodel'
-    params_file_path = '../../pretrained/ch_PP-OCRv3_rec_infer/' \
-                       'inference.pdiparams'
+    model_file_path = 'pretrained/ch_PP-OCRv3_rec_infer/inference.pdmodel'
+    params_file_path = 'pretrained/ch_PP-OCRv3_rec_infer/inference.pdiparams'
     config = inference.Config(model_file_path, params_file_path)
     predictor = inference.create_predictor(config)
 

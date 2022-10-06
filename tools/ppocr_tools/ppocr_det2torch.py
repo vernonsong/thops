@@ -578,7 +578,6 @@ STATE_MAP = {
 
 def map_state(ppocr_state: dict) -> dict:
     torch_state = {}
-    print(ppocr_state)
     for key in STATE_MAP:
         torch_state[key] = torch.from_numpy(ppocr_state[STATE_MAP[key]])
     return torch_state
@@ -586,9 +585,9 @@ def map_state(ppocr_state: dict) -> dict:
 
 def main():
     register_all_modules(init_default_scope=False)
-    torch_model_path = '../../pretrained/ppocr_v3_db.pth'
-    ppocr_model_path = '../../pretrained/ch_PP-OCRv3_det_distill_train/student'
-    cfg = Config.fromfile('../../configs/_base_/models/dbnet_little.py')
+    torch_model_path = 'pretrained/ppocr_v3_db.pth'
+    ppocr_model_path = 'pretrained/ch_PP-OCRv3_det_distill_train/student'
+    cfg = Config.fromfile('configs/_base_/models/dbnet_little.py')
     # model = build_detector(cfg.model)
     model = MODELS.build(cfg.model)
     ppocr_state = fluid.io.load_program_state(ppocr_model_path)
@@ -596,9 +595,9 @@ def main():
     torch.save(torch_state, torch_model_path)
 
     model.load_state_dict(torch_state)
-    img = mmcv.imread('../../demo/2.jpg')
+    img = mmcv.imread('demo/2.jpg')
     cfg = Config.fromfile(
-        '../../configs/_base_/datasets/det_pipeline.py').test_pipeline_1333_736
+        'configs/_base_/datasets/det_pipeline.py').test_pipeline_1333_736
     cfg.pop(0)
     test_pipeline = Compose(cfg)
     inputs = test_pipeline({
@@ -615,10 +614,8 @@ def main():
             model.extract_feat(
                 model.data_preprocessor(inputs, True)['inputs']))
 
-    model_file_path = '../../pretrained/ch_PP-OCRv3_det_infer/' \
-                      'inference.pdmodel'
-    params_file_path = '../../pretrained/ch_PP-OCRv3_det_infer/' \
-                       'inference.pdiparams'
+    model_file_path = 'pretrained/ch_PP-OCRv3_det_infer/inference.pdmodel'
+    params_file_path = 'pretrained/ch_PP-OCRv3_det_infer/inference.pdiparams'
     config = inference.Config(model_file_path, params_file_path)
     predictor = inference.create_predictor(config)
 
