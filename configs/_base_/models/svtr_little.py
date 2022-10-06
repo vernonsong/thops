@@ -6,8 +6,9 @@
 dictionary = dict(
     type='Dictionary',
     dict_file='{{ fileDirname }}/../../../thops/dicts/ppocr_keys_v1.txt',
-    with_padding=False,
-    with_unknown=True)
+    with_padding=True,
+    with_unknown=False,
+    padding_token=' ')
 model = dict(
     type='thops.SVTR',
     backbone=dict(
