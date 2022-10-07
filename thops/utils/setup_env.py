@@ -29,7 +29,7 @@ def register_all_modules(init_default_scope: bool = True) -> None:
 
     # import mmocr.structures  # noqa: F401,F403
     # import mmocr.visualization  # noqa: F401,F403
-    register_all_modules_(init_default_scope=False)
+    register_all_modules_(init_default_scope=True)
     if init_default_scope:
         never_created = DefaultScope.get_current_instance() is None \
                         or not DefaultScope.check_instance_created('thops')
